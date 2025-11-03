@@ -592,9 +592,19 @@ if __name__ == '__main__':
         config_template_path = providers['config_template']
         print('选择: \033[33m' + config_template_path + '\033[0m')
         # print ('Mẫu cấu hình sử dụng: \033[33m' + template_list[uip] + '.json\033[0m')
-        response = requests.get(providers['config_template'])
-        response.raise_for_status()
-        config = response.json()
+
+        # 判断是URL还是本地路径
+        if config_template_path.startswith(('http://', 'https://')):
+          # 远程URL
+          response = requests.get(config_template_path)
+          response.raise_for_status()
+          config = response.json()
+        else:
+          # 本地文件路径
+          config = load_json(config_template_path)
+        # response = requests.get(providers['config_template'])
+        # response.raise_for_status()
+        # config = response.json()
     else:
         template_list = get_template()
         if len(template_list) < 1:
@@ -631,3 +641,4 @@ if __name__ == '__main__':
         final_config = combin_to_config(config, nodes)  # 节点信息添加到模板
     save_config(providers["save_config_path"], final_config)
     # updateLocalConfig('http://127.0.0.1:9090',providers['save_config_path'])
+
